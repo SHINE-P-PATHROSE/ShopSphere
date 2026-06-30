@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}My Addresses{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Saved Addresses</h1>
+        <a href="{% url 'accounts:address_add' %}"
+            class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-700 transition">
+            + Add Address
+        </a>
+    </div>
+
+    {% if addresses %}
+    <div class="grid sm:grid-cols-2 gap-4">
+        {% for address in addresses %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 relative">
+            {% if address.is_default %}
+            <span
+                class="absolute top-3 right-3 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">Default</span>
+            {% endif %}
+            <p class="font-semibold">{{ address.full_name }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {{ address.address_line_1 }}{% if address.address_line_2 %}, {{ address.address_line_2 }}{% endif %}
+            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ address.city }}, {{ address.state }} — {{
+                address.postal_code }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ address.country }}</p>
+            <p class="text-sm text-gray-500 mt-1">📞 {{ address.phone }}</p>
+            <div class="flex gap-3 mt-4">
+                <a href="{% url 'accounts:address_edit' address.pk %}"
+                    class="text-sm text-brand-600 hover:underline">Edit</a>
+                <form method="post" action="{% url 'accounts:address_delete' address.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="text-sm text-red-500 hover:underline"
+                        onclick="return confirm('Delete this address?')">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow">
+        <p class="text-gray-500 text-lg">No addresses saved yet.</p>
+        <a href="{% url 'accounts:address_add' %}"
+            class="inline-block mt-4 bg-brand-600 text-white px-6 py-2 rounded-lg text-sm">Add Your First Address</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

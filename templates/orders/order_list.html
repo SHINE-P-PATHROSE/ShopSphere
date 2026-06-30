@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}My Orders{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">My Orders</h1>
+    <div class="space-y-4">
+        {% for order in orders %}
+        <a href="{% url 'orders:detail' order.order_number %}" class="block bg-white dark:bg-gray-800 rounded-xl p-4 shadow hover:shadow-lg transition">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-bold">#{{ order.order_number }}</p>
+                    <p class="text-sm text-gray-500">{{ order.created_at|date:"M d, Y" }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800">{{ order.get_status_display }}</span>
+                    <p class="font-bold mt-1">₹{{ order.total|floatformat:2 }}</p>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <p class="text-center text-gray-500 py-12">No orders yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

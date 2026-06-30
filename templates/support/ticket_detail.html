@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-start mb-6">
+        <div>
+            <a href="{% url 'support:list' %}" class="text-sm text-brand-600 hover:underline">← All Tickets</a>
+            <h1 class="text-2xl font-bold mt-2">{{ ticket.subject }}</h1>
+            <p class="text-gray-500 text-sm mt-1">
+                #{{ ticket.id }} · {{ ticket.get_category_display }} · Opened {{ ticket.created_at|date:"M d, Y" }}
+            </p>
+        </div>
+        <span class="text-sm px-3 py-1 rounded-full font-medium
+            {% if ticket.status == 'OPEN' %}bg-yellow-100 text-yellow-700
+            {% elif ticket.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-700
+            {% elif ticket.status == 'RESOLVED' %}bg-green-100 text-green-700
+            {% else %}bg-gray-100 text-gray-600{% endif %}">
+            {{ ticket.get_status_display }}
+        </span>
+    </div>
+
+    <div class="space-y-4 mb-8">
+        {% for msg in ticket.messages.all %}
+        <div
+            class="{% if msg.is_staff_reply %}ml-6{% else %}mr-6{% endif %} bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-sm">
+                    {{ msg.sender.full_name }}
+                    {% if msg.is_staff_reply %}<span
+                        class="ml-1 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded">Staff</span>{% endif %}
+                </span>
+                <span class="text-xs text-gray-500">{{ msg.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ msg.body }}</p>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 text-sm">No messages yet.</p>
+        {% endfor %}
+    </div>
+
+    {% if ticket.status != 'CLOSED' %}
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5">
+        <h2 class="font-semibold mb-3">Add Reply</h2>
+        <form method="post" action="{% url 'support:reply' ticket.pk %}">
+            {% csrf_token %}
+            <textarea name="body" rows="4" required placeholder="Type your message..."
+                class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:border-brand-500 resize-none"></textarea>
+            <button type="submit"
+                class="mt-3 bg-brand-600 text-white px-6 py-2 rounded-lg hover:bg-brand-700 transition text-sm font-medium">Send
+                Reply</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

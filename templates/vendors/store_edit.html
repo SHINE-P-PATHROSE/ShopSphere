@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Store{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-10">
+    <h1 class="text-2xl font-bold mb-8">Edit Store Profile</h1>
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <div class="flex gap-3 pt-2">
+                <button type="submit"
+                    class="bg-brand-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-700">Save</button>
+                <a href="{% url 'vendors:dashboard' %}"
+                    class="px-6 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+    input:not([type=file]),
+    textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        background: inherit;
+    }
+
+    input:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+</style>
+{% endblock %}

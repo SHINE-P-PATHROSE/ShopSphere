@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Support Tickets{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Support</h1>
+        <a href="{% url 'support:create' %}"
+            class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-700 transition">+
+            New Ticket</a>
+    </div>
+
+    {% if tickets %}
+    <div class="space-y-3">
+        {% for ticket in tickets %}
+        <a href="{% url 'support:detail' ticket.pk %}"
+            class="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl p-4 shadow hover:shadow-md transition">
+            <div class="min-w-0">
+                <p class="font-semibold truncate">#{{ ticket.id }} — {{ ticket.subject }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ ticket.get_category_display }} · {{ ticket.created_at|date:"M
+                    d, Y" }}</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0 ml-4">
+                <span class="hidden sm:block text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700">{{
+                    ticket.get_priority_display }}</span>
+                <span class="text-xs px-2 py-1 rounded font-medium
+                    {% if ticket.status == 'OPEN' %}bg-yellow-100 text-yellow-700
+                    {% elif ticket.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-700
+                    {% elif ticket.status == 'RESOLVED' %}bg-green-100 text-green-700
+                    {% else %}bg-gray-100 text-gray-600{% endif %}">
+                    {{ ticket.get_status_display }}
+                </span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow">
+        <div class="text-5xl mb-3">🎫</div>
+        <p class="text-gray-500">No support tickets yet.</p>
+        <a href="{% url 'support:create' %}"
+            class="inline-block mt-4 bg-brand-600 text-white px-6 py-2 rounded-lg text-sm">Open a Ticket</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

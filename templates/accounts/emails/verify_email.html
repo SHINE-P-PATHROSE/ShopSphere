@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify your {{ site_name }} account</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .header { background-color: #1a73e8; padding: 32px; text-align: center; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
+    .body { padding: 32px; color: #333333; }
+    .body p { line-height: 1.6; margin: 0 0 16px; }
+    .btn { display: inline-block; padding: 14px 28px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; }
+    .footer { background-color: #f4f4f4; padding: 20px 32px; text-align: center; font-size: 12px; color: #999999; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{{ site_name }}</h1>
+    </div>
+    <div class="body">
+      <p>Hi {{ user.first_name|default:user.email }},</p>
+      <p>Thanks for signing up for {{ site_name }}! Please confirm your email address by clicking the button below.</p>
+      <p style="text-align: center; margin: 32px 0;">
+        <a href="{{ verification_url }}" class="btn">Verify Email Address</a>
+      </p>
+      <p>Or copy and paste this link into your browser:</p>
+      <p style="word-break: break-all; color: #1a73e8;">{{ verification_url }}</p>
+      <p>This link expires in <strong>24 hours</strong>.</p>
+      <p>If you didn't create an account, you can safely ignore this email.</p>
+    </div>
+    <div class="footer">
+      <p>&copy; {{ site_name }}. All rights reserved.</p>
+      <p>You received this email because you signed up at {{ site_name }}.</p>
+    </div>
+  </div>
+</body>
+</html>

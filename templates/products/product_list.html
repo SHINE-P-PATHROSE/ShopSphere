@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if category %}{{ category.name }}{% elif brand %}{{ brand.name }}{% else %}Products{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">{% if category %}{{ category.name }}{% elif brand %}{{ brand.name }}{% else %}All Products{% endif %}</h1>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {% for product in products %}
+        {% include 'includes/product_card.html' with product=product %}
+        {% empty %}
+        <p class="col-span-full text-gray-500 py-12 text-center">No products found.</p>
+        {% endfor %}
+    </div>
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center gap-2 mt-8">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Previous</a>{% endif %}
+        <span class="px-4 py-2">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Next</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

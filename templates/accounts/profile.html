@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-8">My Profile</h1>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+            <h2 class="text-lg font-semibold mb-4 border-b pb-2 dark:border-gray-700">Personal Information</h2>
+            <div class="grid sm:grid-cols-2 gap-4">
+                {% for field in user_form %}
+                <div class="{% if field.field.widget.input_type == 'file' %}sm:col-span-2{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1">{{ field.label
+                        }}</label>
+                    {{ field }}
+                    {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if profile_form %}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+            <h2 class="text-lg font-semibold mb-4 border-b pb-2 dark:border-gray-700">Additional Details</h2>
+            <div class="grid sm:grid-cols-2 gap-4">
+                {% for field in profile_form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1">{{ field.label
+                        }}</label>
+                    {{ field }}
+                    {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="flex gap-3">
+            <button type="submit"
+                class="bg-brand-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-700 transition">Save
+                Changes</button>
+            <a href="{% url 'accounts:dashboard' %}"
+                class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</a>
+        </div>
+    </form>
+</div>
+<style>
+    input:not([type=checkbox]),
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        background: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+</style>
+{% endblock %}

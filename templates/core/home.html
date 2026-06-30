@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Banners -->
+<section class="relative bg-gradient-to-r from-brand-700 to-brand-500 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-16 md:py-24">
+        <div class="max-w-2xl">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Shop Smart. Shop {{ SITE_NAME }}.</h1>
+            <p class="text-lg text-blue-100 mb-8">Discover millions of products from verified sellers across India.</p>
+            <a href="{% url 'products:list' %}" class="inline-block bg-white text-brand-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Shop Now</a>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+{% if categories %}
+<section class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-bold mb-6">Shop by Category</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        {% for cat in categories %}
+        <a href="{% url 'products:category' cat.slug %}" class="group bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow hover:shadow-lg transition hover:-translate-y-1">
+            <div class="w-16 h-16 mx-auto bg-brand-50 dark:bg-brand-900 rounded-full flex items-center justify-center text-2xl mb-2 group-hover:bg-brand-100">{{ cat.icon|default:"📦" }}</div>
+            <span class="text-sm font-medium">{{ cat.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Products -->
+<section class="max-w-7xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Featured Products</h2>
+        <a href="{% url 'products:list' %}" class="text-brand-600 hover:underline">View All →</a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {% for product in featured_products %}
+        {% include 'includes/product_card.html' with product=product %}
+        {% empty %}
+        <p class="col-span-full text-gray-500">No featured products yet. Run <code>python manage.py seed_data</code> to populate demo data.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Latest Arrivals -->
+<section class="max-w-7xl mx-auto px-4 py-10 bg-white dark:bg-gray-800 rounded-2xl my-6">
+    <h2 class="text-2xl font-bold mb-6 px-4">New Arrivals</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 px-4">
+        {% for product in latest_products %}
+        {% include 'includes/product_card.html' with product=product %}
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

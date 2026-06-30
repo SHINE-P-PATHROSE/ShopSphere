@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Reviews for {{ product.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <nav class="text-sm text-gray-500 mb-4">
+        <a href="{% url 'products:detail' product.slug %}" class="hover:text-brand-600">{{ product.title }}</a>
+        <span class="mx-2">›</span>
+        <span>Reviews</span>
+    </nav>
+
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold">Customer Reviews</h1>
+            <p class="text-gray-500 text-sm mt-1">
+                {% if product.average_rating %}
+                <span class="text-yellow-500">★ {{ product.average_rating }}</span> · {{ product.total_reviews }}
+                review{{ product.total_reviews|pluralize }}
+                {% else %}No reviews yet{% endif %}
+            </p>
+        </div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'products:detail' product.slug %}#review-form"
+            class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-700">Write a Review</a>
+        {% endif %}
+    </div>
+
+    <div class="space-y-5">
+        {% for review in reviews %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-semibold">{{ review.user_name }}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-yellow-400">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{%
+                                else %}☆{% endif %}{% endfor %}</span>
+                                <span class="text-gray-500 text-xs">{{ review.created_at|date:"M d, Y" }}</span>
+                                {% if review.is_verified_purchase %}
+                                <span class="text-green-600 text-xs font-medium">✓ Verified Purchase</span>
+                                {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if review.title %}<p class="font-medium mt-3">{{ review.title }}</p>{% endif %}
+            <p class="text-gray-600 dark:text-gray-300 text-sm mt-2">{{ review.body }}</p>
+            {% if review.images.all %}
+            <div class="flex gap-2 mt-3">
+                {% for img in review.images.all %}
+                <img src="{{ img.image.url }}" alt="{{ img.alt_text }}" class="w-16 h-16 object-cover rounded-lg">
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl">
+            <div class="text-5xl mb-3">⭐</div>
+            <p class="text-gray-500">No reviews yet. Be the first to review this product!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

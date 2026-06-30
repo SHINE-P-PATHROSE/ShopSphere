@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Address{% else %}Add Address{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-10">
+    <h1 class="text-2xl font-bold mb-8">{% if object %}Edit{% else %}Add{% endif %} Address</h1>
+
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid sm:grid-cols-2 gap-4">
+                {% for field in form %}
+                <div
+                    class="{% if field.field.widget.input_type == 'checkbox' or forloop.last %}sm:col-span-2{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1">{{ field.label
+                        }}</label>
+                    {{ field }}
+                    {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit"
+                    class="bg-brand-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-700 transition">
+                    {% if object %}Update{% else %}Save{% endif %} Address
+                </button>
+                <a href="{% url 'accounts:addresses' %}"
+                    class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+    input:not([type=checkbox]),
+    select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        background: inherit;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+</style>
+{% endblock %}

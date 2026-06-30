@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}My Products{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">My Products</h1>
+        <a href="{% url 'vendors:dashboard' %}" class="text-sm text-brand-600 hover:underline">← Dashboard</a>
+    </div>
+
+    {% if products %}
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-700 text-left">
+                <tr>
+                    <th class="px-4 py-3 font-semibold">Product</th>
+                    <th class="px-4 py-3 font-semibold">Price</th>
+                    <th class="px-4 py-3 font-semibold">Stock</th>
+                    <th class="px-4 py-3 font-semibold">Sales</th>
+                    <th class="px-4 py-3 font-semibold">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y dark:divide-gray-700">
+                {% for product in products %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <td class="px-4 py-3">
+                        <a href="{% url 'products:detail' product.slug %}" class="font-medium hover:text-brand-600">{{
+                            product.title|truncatechars:50 }}</a>
+                    </td>
+                    <td class="px-4 py-3">₹{{ product.base_price|floatformat:0 }}</td>
+                    <td class="px-4 py-3">
+                        {% if product.in_stock %}<span class="text-green-600">In stock</span>{% else %}<span
+                            class="text-red-500">Out of stock</span>{% endif %}
+                    </td>
+                    <td class="px-4 py-3">{{ product.sales_count }}</td>
+                    <td class="px-4 py-3">
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium
+                            {% if product.status == 'APPROVED' %}bg-green-100 text-green-700
+                            {% elif product.status == 'PENDING' %}bg-yellow-100 text-yellow-700
+                            {% elif product.status == 'REJECTED' %}bg-red-100 text-red-700
+                            {% else %}bg-gray-100 text-gray-600{% endif %}">
+                            {{ product.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow">
+        <div class="text-5xl mb-3">📦</div>
+        <p class="text-gray-500">No products listed yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

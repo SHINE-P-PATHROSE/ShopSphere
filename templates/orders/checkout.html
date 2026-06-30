@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+    <form method="post" class="grid lg:grid-cols-3 gap-8">
+        {% csrf_token %}
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+                <h2 class="font-bold mb-4">Shipping Address</h2>
+                {% for addr in addresses %}
+                <label class="flex items-start gap-3 p-3 border rounded-lg mb-2 cursor-pointer hover:border-brand-500">
+                    <input type="radio" name="address_id" value="{{ addr.id }}" {% if addr.is_default %}checked{% endif %} required>
+                    <div>
+                        <p class="font-medium">{{ addr.full_name }}</p>
+                        <p class="text-sm text-gray-500">{{ addr.address_line_1 }}, {{ addr.city }}, {{ addr.state }} {{ addr.postal_code }}</p>
+                    </div>
+                </label>
+                {% empty %}
+                <p class="text-gray-500">No addresses. <a href="{% url 'accounts:address_add' %}" class="text-brand-600">Add one</a></p>
+                {% endfor %}
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+                <h2 class="font-bold mb-4">Payment Method</h2>
+                <label class="flex items-center gap-2 mb-2"><input type="radio" name="payment_method" value="COD" checked> Cash on Delivery</label>
+                <label class="flex items-center gap-2 mb-2"><input type="radio" name="payment_method" value="RAZORPAY"> Razorpay (UPI/Card)</label>
+                <label class="flex items-center gap-2"><input type="radio" name="payment_method" value="STRIPE"> Stripe (International Cards)</label>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+                <h2 class="font-bold mb-4">Shipping</h2>
+                <label class="flex items-center gap-2 mb-2"><input type="radio" name="shipping_method" value="STANDARD" checked> Standard (3-5 days) — ₹{{ totals.shipping_cost }}</label>
+                <label class="flex items-center gap-2"><input type="radio" name="shipping_method" value="EXPRESS"> Express (1-2 days)</label>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+                <label class="block text-sm font-medium mb-2">Coupon Code</label>
+                <input type="text" name="coupon_code" placeholder="Enter coupon" class="w-full border rounded-lg px-4 py-2 dark:bg-gray-700">
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow h-fit">
+            <h2 class="font-bold mb-4">Order Summary</h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span>Subtotal</span><span>₹{{ totals.subtotal|floatformat:2 }}</span></div>
+                <div class="flex justify-between"><span>GST (18%)</span><span>₹{{ totals.tax_amount|floatformat:2 }}</span></div>
+                <div class="flex justify-between"><span>Shipping</span><span>₹{{ totals.shipping_cost|floatformat:2 }}</span></div>
+            </div>
+            <div class="border-t mt-4 pt-4 flex justify-between font-bold text-lg">
+                <span>Total</span><span>₹{{ totals.total|floatformat:2 }}</span>
+            </div>
+            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg mt-6 font-semibold hover:bg-brand-700">Place Order</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

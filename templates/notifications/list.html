@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Notifications</h1>
+        {% if notifications %}
+        <form method="post" action="{% url 'notifications:read_all' %}">
+            {% csrf_token %}
+            <button type="submit" class="text-sm text-brand-600 hover:underline">Mark all as read</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if notifications %}
+    <div class="space-y-2">
+        {% for notif in notifications %}
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow {% if not notif.is_read %}border-l-4 border-brand-500{% endif %}">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0">
+                    <p
+                        class="font-medium text-sm {% if not notif.is_read %}text-gray-900 dark:text-white{% else %}text-gray-500{% endif %}">
+                        {{ notif.title }}</p>
+                    <p class="text-sm text-gray-500 mt-0.5">{{ notif.message }}</p>
+                    {% if notif.link %}<a href="{{ notif.link }}"
+                        class="text-xs text-brand-600 hover:underline mt-1 block">View →</a>{% endif %}
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-xs text-gray-400">{{ notif.created_at|timesince }} ago</p>
+                    {% if not notif.is_read %}
+                    <form method="post" action="{% url 'notifications:read' notif.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs text-gray-400 hover:text-brand-600 mt-1">Mark read</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center gap-2 mt-6">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+            class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">← Prev</a>
+        {% endif %}
+        <span class="px-4 py-2 text-sm">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+            class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow">
+        <div class="text-5xl mb-3">🔔</div>
+        <p class="text-gray-500">No notifications yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

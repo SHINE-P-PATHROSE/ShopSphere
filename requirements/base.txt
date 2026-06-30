@@ -1,0 +1,53 @@
+# Django Core
+Django>=5.1,<5.2
+djangorestframework>=3.15,<4.0
+django-cors-headers>=4.3,<5.0
+django-filter>=24.0,<25.0
+
+# Authentication
+djangorestframework-simplejwt>=5.3,<6.0
+django-allauth>=65.0,<66.0
+
+# Database
+psycopg2-binary>=2.9,<3.0
+django-mptt>=0.16,<1.0
+
+# Caching & Task Queue
+redis>=5.0,<6.0
+django-redis>=5.4,<6.0
+celery>=5.4,<6.0
+
+# Real-time
+channels>=4.1,<5.0
+channels-redis>=4.2,<5.0
+daphne>=4.1,<5.0
+
+# File Handling
+Pillow>=10.4,<11.0
+django-cleanup>=9.0,<10.0
+
+# Security
+django-axes>=7.0,<8.0
+django-csp>=4.0,<5.0
+
+# API Documentation
+drf-spectacular>=0.27,<1.0
+
+# Utilities
+django-environ>=0.11,<1.0
+django-extensions>=3.2,<4.0
+django-storages>=1.14,<2.0
+whitenoise>=6.7,<7.0
+python-slugify>=8.0,<9.0
+shortuuid>=1.0,<2.0
+
+# Payment Gateways
+stripe>=10.0,<11.0
+razorpay>=1.4,<2.0
+
+# AI/ML (lightweight)
+textblob>=0.18,<1.0
+scikit-learn>=1.5,<2.0
+
+# Export
+openpyxl>=3.1,<4.0

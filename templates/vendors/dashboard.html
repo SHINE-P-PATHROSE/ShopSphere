@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Vendor Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-2">Vendor Dashboard</h1>
+    {% if vendor %}
+    <p class="text-gray-500 mb-8">{{ vendor.business_name }}
+        <span class="ml-2 text-xs px-2 py-1 rounded-full font-medium
+            {% if vendor.status == 'APPROVED' %}bg-green-100 text-green-700
+            {% elif vendor.status == 'PENDING' %}bg-yellow-100 text-yellow-700
+            {% else %}bg-red-100 text-red-700{% endif %}">
+            {{ vendor.get_status_display }}
+        </span>
+    </p>
+
+    {% if vendor.status == 'APPROVED' %}
+    <!-- Quick stats -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow">
+            <p class="text-sm text-gray-500">Total Products</p>
+            <p class="text-2xl font-bold mt-1">{{ products.count }}</p>
+            <a href="{% url 'vendors:products' %}" class="text-xs text-brand-600 hover:underline">Manage →</a>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow">
+            <p class="text-sm text-gray-500">Total Orders</p>
+            <p class="text-2xl font-bold mt-1">{{ order_items.count }}</p>
+            <a href="{% url 'vendors:orders' %}" class="text-xs text-brand-600 hover:underline">View →</a>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow">
+            <p class="text-sm text-gray-500">Store Rating</p>
+            <p class="text-2xl font-bold mt-1 text-yellow-500">★ {{ store.average_rating|floatformat:1 }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow">
+            <p class="text-sm text-gray-500">Commission Rate</p>
+            <p class="text-2xl font-bold mt-1">{{ vendor.commission_rate }}%</p>
+        </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="flex flex-wrap gap-3 mb-8">
+        <a href="{% url 'products:list' %}"
+            class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-700 transition">+ Add Product</a>
+        <a href="{% url 'vendors:store_edit' %}"
+            class="border border-brand-600 text-brand-600 px-4 py-2 rounded-lg text-sm hover:bg-brand-50 transition">Edit
+            Store</a>
+        <a href="{% url 'analytics:vendor' %}"
+            class="border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition">View
+            Analytics</a>
+        {% if store %}<a href="{% url 'vendors:store_detail' store.slug %}"
+            class="border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition">View
+            Store</a>{% endif %}
+    </div>
+
+    <!-- Recent products -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+        <div class="flex justify-between mb-4">
+            <h2 class="text-lg font-bold">Recent Products</h2>
+            <a href="{% url 'vendors:products' %}" class="text-sm text-brand-600 hover:underline">View all</a>
+        </div>
+        {% if products %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="text-left border-b dark:border-gray-700">
+                    <tr>
+                        <th class="pb-2">Product</th>
+                        <th class="pb-2">Price</th>
+                        <th class="pb-2">Stock</th>
+                        <th class="pb-2">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y dark:divide-gray-700">
+                    {% for product in products|slice:":10" %}
+                    <tr>
+                        <td class="py-2">
+                            <a href="{% url 'products:detail' product.slug %}" class="hover:text-brand-600">{{
+                                product.title|truncatechars:40 }}</a>
+                        </td>
+                        <td class="py-2">₹{{ product.base_price|floatformat:0 }}</td>
+                        <td class="py-2">{% if product.in_stock %}<span class="text-green-600">In stock</span>{% else
+                            %}<span class="text-red-500">Out of stock</span>{% endif %}</td>
+                        <td class="py-2"><span class="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700">{{
+                                product.get_status_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-sm">No products yet.</p>
+        {% endif %}
+    </div>
+
+    {% elif vendor.status == 'PENDING' %}
+    <div
+        class="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-2xl p-8 text-center">
+        <div class="text-5xl mb-3">⏳</div>
+        <h2 class="text-xl font-semibold text-yellow-800 dark:text-yellow-200">Application Under Review</h2>
+        <p class="text-yellow-700 dark:text-yellow-300 text-sm mt-2">We'll notify you within 24–48 hours once your
+            application is approved.</p>
+    </div>
+    {% elif vendor.status == 'REJECTED' %}
+    <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-2xl p-8 text-center">
+        <div class="text-5xl mb-3">❌</div>
+        <h2 class="text-xl font-semibold text-red-700 dark:text-red-300">Application Rejected</h2>
+        <p class="text-red-600 dark:text-red-400 text-sm mt-2">{{ vendor.rejection_reason|default:"Please contact
+            support for more information." }}</p>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow">
+        <div class="text-5xl mb-3">🏪</div>
+        <p class="text-gray-500 mb-4">You haven't applied to be a vendor yet.</p>
+        <a href="{% url 'vendors:register' %}"
+            class="bg-brand-600 text-white px-6 py-3 rounded-lg hover:bg-brand-700 transition">Apply Now</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

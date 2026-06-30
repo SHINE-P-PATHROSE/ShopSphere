@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Become a Seller{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-10">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold">Become a Seller</h1>
+        <p class="text-gray-500 mt-2">Join thousands of vendors on {{ SITE_NAME }}. Fill in your business details below.
+        </p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="text-gray-400 text-xs mt-0.5">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+
+            <div
+                class="pt-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-4 py-3 text-sm text-blue-700 dark:text-blue-300">
+                Your application will be reviewed by our team within 24–48 hours.
+            </div>
+
+            <button type="submit"
+                class="w-full bg-brand-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition">
+                Submit Application
+            </button>
+        </form>
+    </div>
+</div>
+<style>
+    input:not([type=file]):not([type=checkbox]),
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        background: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,29 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition overflow-hidden group">
+    <a href="{% url 'products:detail' product.slug %}" class="block">
+        <div class="aspect-square bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
+            {% if product.primary_image %}
+            <img src="{{ product.primary_image.image.url }}" alt="{{ product.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
+            {% else %}
+            <div class="w-full h-full flex items-center justify-center text-4xl text-gray-400">📦</div>
+            {% endif %}
+            {% if product.discount_percentage %}
+            <span class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">{{ product.discount_percentage }}% OFF</span>
+            {% endif %}
+        </div>
+        <div class="p-3">
+            <p class="text-xs text-gray-500 truncate">{{ product.store.name }}</p>
+            <h3 class="font-medium text-sm line-clamp-2 mt-1 group-hover:text-brand-600">{{ product.title }}</h3>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="font-bold text-brand-600">₹{{ product.base_price|floatformat:0 }}</span>
+                {% if product.compare_price %}
+                <span class="text-xs text-gray-400 line-through">₹{{ product.compare_price|floatformat:0 }}</span>
+                {% endif %}
+            </div>
+            {% if product.average_rating %}
+            <div class="flex items-center gap-1 mt-1 text-xs text-yellow-500">
+                ★ {{ product.average_rating }} ({{ product.total_reviews }})
+            </div>
+            {% endif %}
+        </div>
+    </a>
+</div>

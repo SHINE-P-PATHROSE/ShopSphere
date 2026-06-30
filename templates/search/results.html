@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{% if query %}Search: {{ query }}{% else %}Search Products{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Mobile search bar -->
+    <form action="{% url 'search:search' %}" method="get" class="flex mb-6 md:hidden">
+        <input type="search" name="q" value="{{ query }}" placeholder="Search products..."
+            class="flex-1 px-4 py-2 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600">
+        <button type="submit" class="bg-brand-600 text-white px-4 rounded-r-lg">Go</button>
+    </form>
+
+    <div class="flex gap-6">
+        <!-- Filters sidebar -->
+        <aside class="hidden md:block w-56 shrink-0">
+            <form method="get" action="{% url 'search:search' %}" class="space-y-5">
+                <input type="hidden" name="q" value="{{ query }}">
+
+                <div>
+                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wide text-gray-500">Category</h3>
+                    <select name="category" onchange="this.form.submit()"
+                        class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <option value="">All</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wide text-gray-500">Brand</h3>
+                    <select name="brand" onchange="this.form.submit()"
+                        class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <option value="">All</option>
+                        {% for brand in brands %}
+                        <option value="{{ brand.slug }}" {% if request.GET.brand == brand.slug %}selected{% endif %}>
+                            {{ brand.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wide text-gray-500">Price Range</h3>
+                    <div class="flex gap-2">
+                        <input type="number" name="min_price" placeholder="Min" value="{{ request.GET.min_price }}"
+                            class="w-1/2 border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <input type="number" name="max_price" placeholder="Max" value="{{ request.GET.max_price }}"
+                            class="w-1/2 border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <button type="submit"
+                        class="mt-2 w-full text-sm bg-brand-600 text-white py-1 rounded-lg">Apply</button>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wide text-gray-500">Min Rating</h3>
+                    <select name="rating" onchange="this.form.submit()"
+                        class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <option value="">Any</option>
+                        <option value="4" {% if request.GET.rating == "4" %}selected{% endif %}>4★ & up</option>
+                        <option value="3" {% if request.GET.rating == "3" %}selected{% endif %}>3★ & up</option>
+                        <option value="2" {% if request.GET.rating == "2" %}selected{% endif %}>2★ & up</option>
+                        <option value="1" {% if request.GET.rating == "1" %}selected{% endif %}>1★ & up</option>
+                    </select>
+                </div>
+
+                {% if request.GET.category or request.GET.brand or request.GET.min_price or request.GET.max_price or request.GET.rating %}
+                <a href="{% url 'search:search' %}?q={{ query }}" class="block text-sm text-red-500 hover:underline">✕
+                    Clear filters</a>
+                {% endif %}
+            </form>
+        </aside>
+
+        <!-- Results -->
+        <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-sm text-gray-500">
+                    {% if query %}
+                    <strong>{{ page_obj.paginator.count }}</strong> results for "<strong>{{ query }}</strong>"
+                    {% else %}
+                    All products
+                    {% endif %}
+                </p>
+                <form method="get">
+                    {% for key, val in request.GET.items %}
+                    {% if key != "sort" %}<input type="hidden" name="{{ key }}" value="{{ val }}">{% endif %}
+                    {% endfor %}
+                    <select name="sort" onchange="this.form.submit()"
+                        class="border rounded-lg px-3 py-1 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <option value="newest" {% if request.GET.sort == "newest" %}selected{% endif %}>Newest</option>
+                        <option value="popular" {% if request.GET.sort == "popular" %}selected{% endif %}>Popularity
+                        </option>
+                        <option value="price_low_high" {% if request.GET.sort == "price_low_high" %}selected{% endif %}>
+                            Price: Low → High</option>
+                        <option value="price_high_low" {% if request.GET.sort == "price_high_low" %}selected{% endif %}>
+                            Price: High → Low</option>
+                        <option value="rating" {% if request.GET.sort == "rating" %}selected{% endif %}>Top Rated</option>
+                    </select>
+                </form>
+            </div>
+
+            {% if products %}
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                {% for product in products %}
+                {% include 'includes/product_card.html' with product=product %}
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="flex justify-center gap-2 mt-8">
+                {% if page_obj.has_previous %}
+                <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"
+                    class="px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">← Prev</a>
+                {% endif %}
+                <span class="px-4 py-2 text-sm">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
+                    class="px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">Next →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl">
+                <div class="text-6xl mb-4">🔍</div>
+                <p class="text-xl font-semibold mb-2">No products found</p>
+                <p class="text-gray-500 text-sm">Try different keywords or clear the filters.</p>
+                <a href="{% url 'products:list' %}"
+                    class="inline-block mt-4 bg-brand-600 text-white px-6 py-2 rounded-lg text-sm">Browse All
+                    Products</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

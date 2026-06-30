@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Shopping Cart ({{ cart.total_items }} items)</h1>
+    <div class="grid lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-4">
+            {% for item in cart_items %}
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 flex gap-4 shadow">
+                <div class="w-24 h-24 bg-gray-100 rounded-lg shrink-0 flex items-center justify-center">📦</div>
+                <div class="flex-1">
+                    <h3 class="font-medium">{{ item.variant.product.title }}</h3>
+                    <p class="text-sm text-gray-500">{{ item.variant }}</p>
+                    <p class="text-brand-600 font-bold mt-1">₹{{ item.line_total|floatformat:2 }}</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <form action="{% url 'cart:update' item.id %}" method="post" class="flex items-center gap-2">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="w-16 border rounded px-2 py-1 text-center dark:bg-gray-700">
+                        <button type="submit" class="text-sm text-brand-600">Update</button>
+                    </form>
+                    <form action="{% url 'cart:remove' item.id %}" method="post">{% csrf_token %}<button type="submit" class="text-sm text-red-500">Remove</button></form>
+                    <form action="{% url 'cart:save_for_later' item.id %}" method="post">{% csrf_token %}<button type="submit" class="text-xs text-gray-500">Save for later</button></form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl">
+                <p class="text-gray-500 text-lg">Your cart is empty</p>
+                <a href="{% url 'products:list' %}" class="inline-block mt-4 bg-brand-600 text-white px-6 py-2 rounded-lg">Continue Shopping</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if cart_items %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow h-fit sticky top-24">
+            <h2 class="text-lg font-bold mb-4">Order Summary</h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span>Subtotal</span><span>₹{{ cart.subtotal|floatformat:2 }}</span></div>
+                <div class="flex justify-between"><span>Shipping</span><span>Calculated at checkout</span></div>
+            </div>
+            <div class="border-t mt-4 pt-4 flex justify-between font-bold text-lg">
+                <span>Total</span><span>₹{{ cart.subtotal|floatformat:2 }}</span>
+            </div>
+            <a href="{% url 'orders:checkout' %}" class="block w-full bg-brand-600 text-white text-center py-3 rounded-lg mt-6 font-semibold hover:bg-brand-700">Proceed to Checkout</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

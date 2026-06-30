@@ -1,0 +1,6 @@
+"""Coupon web URLs."""
+from django.urls import path
+
+app_name = 'coupons'
+
+urlpatterns = []

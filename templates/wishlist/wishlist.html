@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}My Wishlist{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-8">My Wishlist</h1>
+
+    {% if items %}
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {% for item in items %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden group relative">
+            <form method="post" action="{% url 'wishlist:toggle' item.product.id %}">
+                {% csrf_token %}
+                <button type="submit"
+                    class="absolute top-2 right-2 z-10 bg-white dark:bg-gray-700 rounded-full w-7 h-7 flex items-center justify-center text-red-500 shadow hover:bg-red-50 transition text-lg leading-none"
+                    title="Remove">×</button>
+            </form>
+            <a href="{% url 'products:detail' item.product.slug %}">
+                <div class="aspect-square bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
+                    {% if item.product.primary_image %}
+                    <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.title }}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-4xl text-gray-400">📦</div>
+                    {% endif %}
+                </div>
+                <div class="p-3">
+                    <p class="text-xs text-gray-500 truncate">{{ item.product.store.name }}</p>
+                    <p class="font-medium text-sm line-clamp-2 mt-1 group-hover:text-brand-600">{{ item.product.title }}
+                    </p>
+                    <p class="font-bold text-brand-600 mt-1">₹{{ item.product.base_price|floatformat:0 }}</p>
+                </div>
+            </a>
+            <div class="px-3 pb-3">
+                <form method="post" action="{% url 'cart:add' %}">
+                    {% csrf_token %}
+                    {% with item.product.variants.first as variant %}
+                    {% if variant %}
+                    <input type="hidden" name="variant_id" value="{{ variant.id }}">
+                    <button type="submit"
+                        class="w-full bg-brand-600 text-white py-1.5 rounded-lg text-sm hover:bg-brand-700 transition">Add
+                        to Cart</button>
+                    {% else %}
+                    <p class="text-xs text-gray-400 text-center pb-1">Out of stock</p>
+                    {% endif %}
+                    {% endwith %}
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow">
+        <div class="text-6xl mb-4">♡</div>
+        <p class="text-xl font-semibold mb-2">Your wishlist is empty</p>
+        <p class="text-gray-500 text-sm mb-6">Save products you love and find them here later.</p>
+        <a href="{% url 'products:list' %}"
+            class="bg-brand-600 text-white px-6 py-3 rounded-lg hover:bg-brand-700 transition">Browse Products</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
